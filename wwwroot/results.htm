@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+		  
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="apple-touch-icon" href="x.png" /> <!-- FIX THIS? -->
+	<title>Feedback Results</title>
+
+	<style type="text/css">
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		height: 100%;
+		width: 100%;
+	}
+
+	tr, td {
+		border: 1px solid #ccc;
+	}
+	</style>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+	<script>
+	var webdis = "http://cheesecake.sdfsdfs.com:7379/";
+
+	function getResults(id){
+		$.ajax({
+			url: webdis + "GET/" + id + "_yay.txt",
+			type: "GET"
+		}).done( function(data) {
+			$('#r_yay_' + id).text(data);
+		});
+
+		$.ajax({
+			url: webdis + "GET/" + id + "_meh.txt",
+			type: "GET"
+		}).done( function(data) {
+			$('#r_meh_' + id).text(data);
+		});
+		
+		$.ajax({
+			url: webdis + "GET/" + id + "_nay.txt",
+			type: "GET"
+		}).done( function(data) {
+			$('#r_nay_' + id).text(data);
+		});
+	}
+
+	function sendEmail(id){
+		var bodyMsg = "Hello,%0D%0A%0D%0A" +
+						  "Thank you for speaking at our event. " +
+						  "Your talk received the following feedback:%0D%0A%0D%0A" +
+						  "Green: " + $('#r_yay_' + id).text() + "%0D%0A" +
+						  "Yellow: " + $('#r_meh_' + id).text() + "%0D%0A" +
+						  "Red: " + $('#r_nay_' + id).text() + "%0D%0A" +
+			           "%0D%0A%0D%0AKind Regards,%0D%0A" +
+			           "Event Team%0D%0A";
+
+		$(location).attr('href','mailto:' + $('#r_email_' + id).text()
+		+ '?subject=Feedback for your talk: ' + $('#r_title_' + id).text()
+		+ '&body=' + bodyMsg);
+
+		$('#r_id_' + id).css("background", "#ccc");
+	}
+
+	$(document).ready(function(){
+		$.ajax({
+			url: "/sessions",
+			type: "GET"
+		}).done( function(data) {
+			var t = jQuery.parseJSON(data);
+			$.each(t.talks, function(index, talk) {
+				$('#results > tbody:last').append($('<tr>').attr('id', 'r_id_' + talk.id)
+				 						  .append($('<td>').text(talk.id))
+										  .append($('<td>').attr('id', 'r_title_' + talk.id).text(talk.title))
+										  .append($('<td>').attr('id', 'r_email_' + talk.id).text(talk.email))
+										  .append($('<td>').attr('id', 'r_yay_' + talk.id))
+										  .append($('<td>').attr('id', 'r_meh_' + talk.id))
+										  .append($('<td>').attr('id', 'r_nay_' + talk.id))
+										  .append($('<td>').text("email").click(function(){ sendEmail(talk.id) }))
+										  );
+				
+				getResults(talk.id);
+			});
+		});
+
+	});
+	</script>
+
+</head>
+
+<body>
+
+<h1>Feedback Results</h1>
+
+<table id="results">
+	<thead>
+		<tr>
+			<th scope="col">ID</th>
+			<th scope="col">Title</th>
+			<th scope="col">Speaker</th>
+			<th scope="col">:)</th>
+			<th scope="col">:|</th>
+			<th scope="col">:(</th>
+			<th scope="col">Mail</th>
+		</tr>
+	</thead>
+	<tbody />
+</table>
+
+
+</body>
+
+</html>

@@ -1,0 +1,116 @@
+#!/bin/bash
+
+function pinfo {
+	echo -e '\E[37;44m'"\033[1m$1\033[0m"
+}
+
+function perror {
+	echo -e '\E[37;41m'"\033[1mERROR: $1\033[0m"
+}
+
+function get {
+	wget $1 -O $2
+
+	if [ $? -ne 0 ]; then
+		perror "Can't download $1"
+		exit
+	fi
+}
+
+function setup_oy {
+	mkdir -p bin
+
+	pinfo "Downloading redis"
+	get http://download.redis.io/redis-stable.tar.gz redis.tar.gz
+
+	pinfo "Downloading webdis"
+	get https://github.com/nicolasff/webdis/archive/master.zip webdis.zip
+
+	pinfo "Downloading mongoose"
+	get https://github.com/valenok/mongoose/archive/master.zip mongoose.zip
+
+	pinfo "Installing libevent (for webdis)"
+	sudo apt-get -y install libevent-dev
+
+	pinfo "Building redis"
+	tar xaf redis.tar.gz
+	pushd redis-stable
+	make
+	cp src/redis-server ../bin
+	cp src/redis-cli ../bin
+	popd
+
+	pinfo "Building webdis"
+	unzip -o webdis.zip
+	pushd webdis-master
+	make
+	mv webdis ../bin
+	popd
+
+	pinfo "Building mongoose"
+	unzip -o mongoose.zip
+	pushd mongoose-master/build
+	make unix
+	cp mongoose ../../bin
+	popd
+
+	pinfo "Cleaning build artifacts"
+	rm -rf mongoose-master webdis-master redis-stable mongoose.zip webdis.zip redis.tar.gz
+
+}
+
+function start_oy {
+	mkdir -p data
+
+	pinfo "Starting redis, webdis and mongoose"
+
+	pushd bin
+	
+	./redis-server --dir ../data &
+	sleep 5	# wait until redis is alive before starting webdis
+	./webdis &
+	./mongoose -listening_ports 7378 -document_root ../wwwroot &
+
+	popd
+
+}
+
+function stop_oy {
+	pinfo "Stopping redis, webdis and mongoose"
+
+	# save redis data	
+	bin/redis-cli SAVE
+	sleep 5
+
+	sudo pkill redis-server
+	sudo pkill webdis
+	sudo pkill mongoose
+}
+
+function usage {
+	echo "Usage: oy.sh (setup|start|stop)"
+	echo "  setup : Fetch and compile redis and webdis"
+	echo "  start : Start redis, webdis and mongoose"
+	echo "  stop  : Stop redis, webdis and mongoose"
+}
+
+if [ $# -ne 1 ] ; then
+	usage	  
+	exit
+fi
+
+case "$1" in
+	"setup")
+		setup_oy
+		;;
+	"start")
+		start_oy
+		;;
+	"stop")
+		stop_oy
+		;;
+	*)
+		usage
+		;;
+esac
+

@@ -1,0 +1,8 @@
+{
+	"talks": [
+		{ "id":"1" , "title":"Keynote: Foo Bar Baz", "email":"foo@bar.com" },
+		{ "id":"2" , "title":"Lorem Ipsum Reloaded", "email":"foo@bar.com" },
+		{ "id":"3" , "title":"Quick Fox and the Lazy Dog", "email":"foo@bar.com" }
+	]
+
+}

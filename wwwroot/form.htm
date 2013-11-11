@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+		  
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="apple-touch-icon" href="x.png" /> <!-- FIX THIS? -->
+	<title>Vote</title>
+
+	<style type="text/css">
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		height: 100%;
+		width: 100%;
+		overflow: hidden;
+	}
+
+	#buttons {
+		width: 100%;
+		height: 100% !important;
+		text-align: center;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+	}
+
+	#yay, #nay, #meh {
+		width: 32%;
+		height: 100% !important;
+		border: 0px;
+		font-color: white;
+		font-size: 100px;
+	}
+
+	#yay {
+		background: #00FF00;
+	}
+
+	#meh {
+		background: #FFFF33;
+	}
+
+	#nay {
+		background: #FF1919;
+	}
+
+	.busy {
+		background: #ccc !important;
+	}
+	</style>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+	<script>
+	var sessionId = document.URL.split(/[\?]+/).pop();
+	var webdis = "http://cheesecake.sdfsdfs.com:7379/";
+
+	function vote(vote){
+		$.ajax({
+			url: webdis + 'INCR/' + sessionId + '_' + vote
+		});
+	}
+
+	$(document).ready(function(){
+
+		$("button").click( function(e) {
+			e.preventDefault();
+			
+			$(this).addClass("busy");
+			setTimeout( function() {
+				$("button").removeClass("busy");
+			}, 400);
+		});
+
+		$("button#yay").click( function(e) {
+			vote("yay");
+		});
+		
+		$("button#meh").click( function() {
+			vote("meh");
+		});
+
+		$("button#nay").click( function() {
+			vote("nay");
+ 		});
+
+	});
+	</script>
+
+</head>
+
+<body>
+	<div id="buttons">
+		<button type="button" name="yay" id="yay" value="yay">:)</button>
+		<button type="button" name="meh" id="meh" value="meh">:|</button>
+		<button type="button" name="nay" id="nay" value="nay">:(</button>
+	</div>
+</body>
+
+</html>
+
