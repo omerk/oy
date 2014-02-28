@@ -17,6 +17,11 @@ function get {
 	fi
 }
 
+function clean {
+	pinfo "Cleaning build artifacts"
+	rm -rf mongoose-4.0 webdis-master redis-stable mongoose.tar.gz webdis.tar.gz redis.tar.gz
+}
+
 function setup_oy {
 	mkdir -p bin
 
@@ -24,13 +29,13 @@ function setup_oy {
 	get http://download.redis.io/redis-stable.tar.gz redis.tar.gz
 
 	pinfo "Downloading webdis"
-	get https://github.com/nicolasff/webdis/archive/master.zip webdis.zip
+	get https://github.com/nicolasff/webdis/archive/master.tar.gz webdis.tar.gz
 
 	pinfo "Downloading mongoose"
-	get https://github.com/valenok/mongoose/archive/master.zip mongoose.zip
+	get https://github.com/omerk/mongoose/archive/4.0.tar.gz mongoose.tar.gz
 
-	pinfo "Installing libevent (for webdis)"
-	sudo apt-get -y install libevent-dev
+	pinfo "Installing libevent (for webdis) and build-essential"
+	sudo apt-get -y install build-essential libevent-dev
 
 	pinfo "Building redis"
 	tar xaf redis.tar.gz
@@ -41,22 +46,20 @@ function setup_oy {
 	popd
 
 	pinfo "Building webdis"
-	unzip -o webdis.zip
+	tar xaf webdis.tar.gz
 	pushd webdis-master
 	make
 	mv webdis ../bin
 	popd
 
 	pinfo "Building mongoose"
-	unzip -o mongoose.zip
-	pushd mongoose-master/build
-	make unix
+	tar xf mongoose.tar.gz
+	pushd mongoose-4.0/build
+	make linux
 	cp mongoose ../../bin
 	popd
 
-	pinfo "Cleaning build artifacts"
-	rm -rf mongoose-master webdis-master redis-stable mongoose.zip webdis.zip redis.tar.gz
-
+	clean
 }
 
 function start_oy {
