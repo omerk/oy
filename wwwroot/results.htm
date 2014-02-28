@@ -53,7 +53,7 @@
 
 	function sendEmail(id){
 		var bodyMsg = "Hello,%0D%0A%0D%0A" +
-						  "Thank you for speaking at our event. " +
+						  "Thank you for speaking at " + eventName + ". " +
 						  "Your talk received the following feedback:%0D%0A%0D%0A" +
 						  "Green: " + $('#r_yay_' + id).text() + "%0D%0A" +
 						  "Yellow: " + $('#r_meh_' + id).text() + "%0D%0A" +
@@ -62,7 +62,7 @@
 			           "Event Team%0D%0A";
 
 		$(location).attr('href','mailto:' + $('#r_email_' + id).text()
-		+ '?subject=Feedback for your talk: ' + $('#r_title_' + id).text()
+		+ '?subject=' + eventName + ' - Feedback for your talk: ' + $('#r_title_' + id).text()
 		+ '&body=' + bodyMsg);
 
 		$('#r_id_' + id).css("background", "#ccc");
