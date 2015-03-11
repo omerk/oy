@@ -35,6 +35,7 @@ function setup_oy {
 	get https://github.com/omerk/mongoose/archive/4.0.tar.gz mongoose.tar.gz
 
 	pinfo "Installing libevent (for webdis) and build-essential"
+	sudo apt-get update
 	sudo apt-get -y install build-essential libevent-dev
 
 	pinfo "Building redis"
